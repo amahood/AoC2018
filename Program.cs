@@ -30,6 +30,9 @@ namespace AoC2018
                 case 3:
                     Day3.TestDay3();
                     break;
+                    case 4:
+                    Day4.TestDay4();
+                    break;
                 default:
                     break; 
             }
