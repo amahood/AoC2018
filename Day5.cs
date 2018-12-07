@@ -15,7 +15,46 @@ namespace AoC2018
             StreamReader sr = new StreamReader("Day5Input.txt");
             //StreamReader sr = new StreamReader("Day5Input.1.txt");
             string rawPolymer = sr.ReadLine();
+            string rawPolymer2 = rawPolymer;
 
+            string part1Polymer = Day5.ReducePolymer(rawPolymer);
+
+            Console.WriteLine("Final string - " + part1Polymer + " / length - "+part1Polymer.Count());
+
+            //PART 2
+            int currentSmallestLength = rawPolymer2.Count();
+            int currentRemoveUnit = 0;
+            for (int remove = 0;remove<26;remove++)
+            {
+                //go through and remove all instances of lower and upper - THIS IS GOOD
+                string rawPolymerCopy = rawPolymer2;
+                int removeTracker = 0;
+                while (removeTracker<rawPolymerCopy.Count())
+                {
+                    if ( (rawPolymerCopy[removeTracker]==65+remove) || (rawPolymerCopy[removeTracker]==97+remove))
+                    {
+                        rawPolymerCopy = rawPolymerCopy.Remove(removeTracker,1);
+                    }
+                    else{
+                        removeTracker++;
+                    }
+                }
+
+                //process and capture smallest length
+                string processedPolymer = Day5.ReducePolymer(rawPolymerCopy);
+                if (processedPolymer.Count()<currentSmallestLength)
+                {
+                    currentSmallestLength = processedPolymer.Count();
+                    currentRemoveUnit = remove;
+                }
+            }
+
+            Console.WriteLine("Best option is - "+(char)(currentRemoveUnit+65)+" - shortest result - "+currentSmallestLength);
+            
+        }
+
+        public static string ReducePolymer(string rawPolymer)
+        {
             bool wasTouched = true;
 
             while (wasTouched)
@@ -55,8 +94,7 @@ namespace AoC2018
                 }
             }
 
-            Console.WriteLine("Final string - " + rawPolymer + " / length - "+rawPolymer.Count());
-            
+            return rawPolymer;
         }
     }
 
