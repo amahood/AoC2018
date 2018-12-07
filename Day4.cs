@@ -133,8 +133,6 @@ namespace AoC2018
                 }
             }
 
-            //TODO LEFT OFF HERE
-            //NEED TO FIND MOST USED MINUTE, HAVE LIST OF ALL SLEEPS FROM GUARD
             int[] sleepingMinutes = new int[sleepingTotalTracker];
             int sIndex = 0;
             foreach (Tuple<int,int,int,int> t in sleepiestGuardLog)
@@ -174,6 +172,83 @@ namespace AoC2018
             Console.WriteLine("Minutes Sleeping - "+maxGuardSleeping);
             Console.WriteLine("Guard Sleepiness Factor - "+multFactor);
             
+
+            //Part 2
+            //SleepingLog has all entries of guards, minutes asleep, starting minute, ending minute
+            //Go through all logs and 
+
+            List<GuardEntry> guardLog = new List<GuardEntry>();
+            foreach (Tuple<int,int,int,int> t in sleepingLog)
+            {
+                GuardEntry ge = new GuardEntry();
+                ge.guardNo = t.Item1;
+                for (int s = t.Item3;s<t.Item4;s++)
+                {
+                    ge.sleepingMinuteTracker.Add(s);
+                }
+                guardLog.Add(ge);
+            }
+
+            List<GuardEntry> unifiedGuardLog = new List<GuardEntry>();
+            List<int> guardsSeen = new List<int>();            
+            foreach (GuardEntry ge in guardLog)
+            {
+                if (!guardsSeen.Contains(ge.guardNo))
+                {
+                    guardsSeen.Add(ge.guardNo);
+                    GuardEntry newGe = new GuardEntry();
+                    newGe.guardNo = ge.guardNo;
+                    foreach (GuardEntry ige in guardLog)
+                    {
+                        if (ge.guardNo==ige.guardNo)
+                        {
+                            foreach (int i in ige.sleepingMinuteTracker)
+                            {
+                                newGe.sleepingMinuteTracker.Add(i);
+                            }
+                        }
+                    }
+                    unifiedGuardLog.Add(newGe);
+                }
+            }
+
+            int targetGuardNumber = 0;
+            int maxMinuteFreq = 0;
+            int targetMinute = 0;
+            int trackingMinuteFreq = 0;
+            int previousMinute = 0;
+
+            foreach (GuardEntry uge in unifiedGuardLog)
+            {
+
+                
+                //sort list
+                uge.sleepingMinuteTracker.Sort();
+                foreach (int i in uge.sleepingMinuteTracker)
+                {
+                    if (i==previousMinute)
+                    {
+                        //increment trackingminutefreq
+                        trackingMinuteFreq++;
+                    }
+                    else
+                    {
+                        //means we are on new number, nneed to back compare
+                        if (trackingMinuteFreq>maxMinuteFreq)
+                        {
+                            targetMinute = previousMinute;
+                            maxMinuteFreq = trackingMinuteFreq;
+                            targetGuardNumber = uge.guardNo;
+                        }
+                        previousMinute = i;
+                        trackingMinuteFreq = 0;
+                    }
+                }
+            }
+
+            Console.WriteLine("Part 2 answer");
+            Console.WriteLine("Answer - " + targetGuardNumber*targetMinute);
+
         }
     }
 
@@ -186,6 +261,16 @@ namespace AoC2018
         public DateTime eventTime;
         public string eventType;
         public int guardNumber;
+    }
+
+    public class GuardEntry
+    {
+        public GuardEntry()
+        {
+            sleepingMinuteTracker = new List<int>();
+        }
+        public int guardNo;
+        public List<int> sleepingMinuteTracker;
     }
 }
 
