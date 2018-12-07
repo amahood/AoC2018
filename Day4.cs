@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace AoC2018
 {
@@ -12,15 +13,166 @@ namespace AoC2018
             Console.WriteLine("-------------------DAY 4-------------------");
 
             StreamReader sr = new StreamReader("Day4Input.txt");
+            //StreamReader sr = new StreamReader("Day4Input.1.txt");
             string line;
+            List<LogEntry> log = new List<LogEntry>();
+
             while ((line = sr.ReadLine()) != null)
             {
+                LogEntry tempLE = new LogEntry();
+                bool dateParse = DateTime.TryParse(line.Substring(1,16), out tempLE.eventTime);
+                string remainder = line.Substring(19);
+
+                switch(remainder[0])
+                {
+                    case 'G':
+                        string s = remainder.Substring(7);
+                        //now split on space and take array 0
+                        string[] sa = s.Split(' ');
+                        tempLE.eventType = "guard";
+                        tempLE.guardNumber = Int32.Parse(sa[0]);
+                        break;
+                    case 'f':
+                        tempLE.eventType = "sleep";
+                        break;
+                    case 'w':
+                        tempLE.eventType = "wake";
+                        break;
+                }
+
+                log.Add(tempLE);
+            }
+
+            List<LogEntry> sortedLog = log.OrderBy(o=>o.eventTime).ToList();
+            int lastGuard = 0;
+            string lastSeen = "";
+            
+            List<Tuple<int,int,int,int>> sleepingLog = new List<Tuple<int, int,int,int>>();
+
+            int sleepingMinute = 0;
+
+            foreach (LogEntry l in sortedLog)
+            {
+                
+                switch (l.eventType)
+                {
+                    case "guard":
+                        if (lastSeen=="sleep")
+                        {
+                            Console.WriteLine("Error condition");
+                        }
+                        lastGuard = l.guardNumber;
+                        lastSeen = "guard";
+                        break;
+                    case "sleep":            
+                        if (lastSeen=="sleep")
+                        {
+                            Console.WriteLine("Error condition");
+                        }
+                        else
+                        {
+                            sleepingMinute = l.eventTime.Minute;
+                        }
+                        lastSeen = "sleep";
+                        break;
+                    case "wake":
+                        if (lastSeen!="sleep")
+                        {
+                            Console.WriteLine("Error condition");
+                        }
+                        else
+                        {
+                            int wakeMinute = l.eventTime.Minute;
+                            int sleepingDuration = wakeMinute-sleepingMinute;
+                            sleepingLog.Add(Tuple.Create(lastGuard, sleepingDuration,sleepingMinute,wakeMinute));
+                        }
+                        lastSeen = "wake";
+                        break;
+                }
+            }
+
+            //find max guard number
+            int maxGuard = 0;
+            foreach (Tuple<int,int,int,int> t in sleepingLog)
+            {
+                if (t.Item1>maxGuard)
+                {
+                    maxGuard = t.Item1;
+                }
+            }
+
+            int maxGuardSleeping = 0;
+            int sleepiestGuard = 0;
+            int sleepingTotalTracker = 0;
+
+            for (int i = 0;i<maxGuard+1;i++)
+            {
+                int sleepingTotal = 0;;
+                foreach (Tuple<int,int,int,int> t in sleepingLog)
+                {
+                    if (t.Item1==i)
+                    {
+                        sleepingTotal+=t.Item2;
+                    }
+                }
+                if (sleepingTotal>maxGuardSleeping)
+                {
+                    maxGuardSleeping = sleepingTotal;
+                    sleepiestGuard = i;
+                    sleepingTotalTracker = sleepingTotal;
+                }
+            }
+
+            //Need to go look at log entries now because we don't just need durations, we need specific minutes
+            List<Tuple<int,int,int,int>> sleepiestGuardLog = new List<Tuple<int, int,int,int>>();
+            foreach (Tuple<int,int,int,int> t in sleepingLog)
+            {
+                if (t.Item1==sleepiestGuard)
+                { 
+                    sleepiestGuardLog.Add(Tuple.Create(sleepiestGuard, t.Item2,t.Item3,t.Item4));
+                }
+            }
+
+            //TODO LEFT OFF HERE
+            //NEED TO FIND MOST USED MINUTE, HAVE LIST OF ALL SLEEPS FROM GUARD
+            int[] sleepingMinutes = new int[sleepingTotalTracker];
+            int sIndex = 0;
+            foreach (Tuple<int,int,int,int> t in sleepiestGuardLog)
+            {
+                for (int s = t.Item3; s<t.Item4;s++)
+                {
+                    sleepingMinutes[sIndex] = s;
+                    sIndex++;
+                }
+            }
+
+            int sleepiestMinute = 0;
+            int maxSleepMinute = sleepingMinutes.Max();
+            int sleepiestMinuteCount = 0;
+
+            foreach (int i in sleepingMinutes)
+            {
+                int currentSleepMinuteCount = 0;
+                
+                foreach (int j in sleepingMinutes)
+                {
+                    if (i==j){
+                        currentSleepMinuteCount++;
+                        }
+                }
+                if (currentSleepMinuteCount > sleepiestMinuteCount)
+                {
+                    sleepiestMinute = i;
+                    sleepiestMinuteCount = currentSleepMinuteCount;
+                }
                 
             }
 
-
-            DateTime dt;
-            //bool test = DateTime.TryParse("1518-03-31 00:50", out dt);
+            int multFactor = 0;
+            multFactor = sleepiestGuard * sleepiestMinute;
+            Console.WriteLine("Sleepiest Guard - "+sleepiestGuard);
+            Console.WriteLine("Minutes Sleeping - "+maxGuardSleeping);
+            Console.WriteLine("Guard Sleepiness Factor - "+multFactor);
             
         }
     }
@@ -29,7 +181,6 @@ namespace AoC2018
     {
         public LogEntry()
         {
-
         }
 
         public DateTime eventTime;

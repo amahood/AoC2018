@@ -9,3 +9,14 @@ C:\Users\Adam\AdventOfCode2018\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.AssemblyI
 C:\Users\Adam\AdventOfCode2018\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.AssemblyInfo.cs
 C:\Users\Adam\AdventOfCode2018\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.dll
 C:\Users\Adam\AdventOfCode2018\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.pdb
+C:\AoC2018\bin\Debug\netcoreapp2.0\AoC2018.deps.json
+C:\AoC2018\bin\Debug\netcoreapp2.0\AoC2018.runtimeconfig.json
+C:\AoC2018\bin\Debug\netcoreapp2.0\AoC2018.runtimeconfig.dev.json
+C:\AoC2018\bin\Debug\netcoreapp2.0\AoC2018.dll
+C:\AoC2018\bin\Debug\netcoreapp2.0\AoC2018.pdb
+C:\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.csprojAssemblyReference.cache
+C:\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.csproj.CoreCompileInputs.cache
+C:\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.AssemblyInfoInputs.cache
+C:\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.AssemblyInfo.cs
+C:\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.dll
+C:\AoC2018\obj\Debug\netcoreapp2.0\AoC2018.pdb
