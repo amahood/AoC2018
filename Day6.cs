@@ -104,6 +104,33 @@ namespace AoC2018
             }
 
             Console.WriteLine("Highest non-infinite area - "+currentHighestArea);
+
+            //--------------------------PART 2---------------------------------------------------
+            int safeAreaCounter = 0;
+            for (int x = left;x<right+1;x++)
+            {
+                for (int y = bottom;y<top+1;y++)
+                {
+                    bool stillGoodManhattan = true;
+                    int orderedPairsCounter = 0;
+                    int runningManhattan = 0;
+
+                    while (stillGoodManhattan && orderedPairsCounter<orderedPairs.Count)
+                    {
+                        int tempManDistance = CalculateManhattanDistance(orderedPairs[orderedPairsCounter], Tuple.Create(x,y));
+                        runningManhattan += tempManDistance;
+                        if (runningManhattan>=10000)
+                        {
+                            stillGoodManhattan =false;
+                        }
+                        orderedPairsCounter++;
+                    }
+                    if (stillGoodManhattan)safeAreaCounter++;
+                }
+            }
+
+            Console.WriteLine("Safe area counter - "+safeAreaCounter);
+            
         }
 
         public static int CalculateManhattanDistance(Tuple<int,int> point1, Tuple<int,int> point2)
