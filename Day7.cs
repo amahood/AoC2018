@@ -71,26 +71,86 @@ namespace AoC2018
                 }
             }
 
+            //Part 2 work
+            //Create initial trackers and variables includ9ing dictionary of worker and current step
+            int workerCount = 5;
+            int delayCount = 60;
+            int secondCounter = 0;
+            int workersWorking = 0;
+            List<Worker> workers = new List<Worker>();
+            //
+
             //Now Traverse map
             StringBuilder sb = new StringBuilder();
             HashSet<char> haveProcessed = new HashSet<char>();
-            while (readySteps.Count>0)
+            while (workersWorking!=0 || readySteps.Count>0)
             {
-                //pick lowest from available and add to string builder
-                char lowestChar = FindLowestWithAllPreReqsMet( haveProcessed, readySteps, instructionNodes);
-                sb.Append(lowestChar);
-                //remove from available
-                readySteps.Remove(lowestChar);
-                haveProcessed.Add(lowestChar);
-                //find available from what we just removed and add
-                foreach (char c in FindAvailable(lowestChar,instructionNodes,endNode))
+                bool workersRemaining = true;
+                bool holdingPatter = false;
+
+                //THIS IS EFFECTIVELY THE POINT WHERE WE ASSIGN OUT STEPS
+                //See which workers are free
+                //if so, give out work if work is available
+                //Assigning out work
+                while (workersRemaining && readySteps.Count>0 && !holdingPatter)
                 {
-                    if (!readySteps.Contains(c) && !haveProcessed.Contains(c)){ readySteps.Add(c);}
+                    if (workersWorking<workerCount)
+                    {
+                        char lowestChar = FindLowestWithAllPreReqsMet( haveProcessed, readySteps, instructionNodes);
+                        if (lowestChar!='0')
+                        {
+                            workers.Add(new Worker(lowestChar, delayCount));
+                            workersWorking++;
+                            //remove from available
+                            readySteps.Remove(lowestChar);
+                        }
+                        else
+                        {
+                            holdingPatter=true;
+                        }
+                    }
+                    else
+                    {
+                        workersRemaining = false;
+                    }
+                }              
+
+                bool workerFinished = false;
+                HashSet<char> finsihedLetters = new HashSet<char>();
+                foreach (Worker w in workers)
+                {
+                    w.timeLeft--;
+                    if (w.timeLeft==0)
+                    {
+                        workerFinished = true;
+                        finsihedLetters.Add(w.assignment);
+                        w.assignmentFinished = true;
+                        workersWorking--;
+                        haveProcessed.Add(w.assignment);
+                        sb.Append(w.assignment);
+                    }
                 }
+                //increment seconds counter
+                secondCounter++;
+                workers.RemoveAll(w=>w.assignmentFinished==true);
+                
+                //check if any finished, if so, grab them and go into below
+                if (workerFinished)
+                {
+                    foreach (char fl in finsihedLetters)
+                    {
+                        foreach (char c in FindAvailable(fl,instructionNodes,endNode))
+                        {
+                            if (!readySteps.Contains(c) && !haveProcessed.Contains(c)){ readySteps.Add(c);}
+                        }
+                    }
+                }
+
             }
-            sb.Append(endNode);
+            //sb.Append(endNode);
 
             Console.WriteLine("Order - " + sb.ToString());
+            Console.WriteLine("Duration - "+secondCounter);
         }
 
         public static List<char> FindAvailable(char c,List<Node> instructionNodes, char endNode)
@@ -99,7 +159,8 @@ namespace AoC2018
             //Add available steps - things for which c is a pre-requisite
             foreach (Node n in instructionNodes)
             {
-                if (n.nodePreReqs.Contains(c) && n.nodeName!=endNode)
+                //if (n.nodePreReqs.Contains(c) && n.nodeName!=endNode)
+                if (n.nodePreReqs.Contains(c))
                 {
                     availableSteps.Add(n.nodeName);
                 }
@@ -110,12 +171,13 @@ namespace AoC2018
 
         public static char FindLowestWithAllPreReqsMet(HashSet<char> haveProcessed, List<char> readySteps, List<Node> instructionNodes)
         {
+            //TODO - Doesn't work properly without end being filtered out before
             char ch = '0';
             readySteps.Sort();
             bool returnFound = false;
             int loopTracker = 0;
             List<char> nodePreReqs = new List<char>();
-            while (!returnFound)
+            while (!returnFound && loopTracker<readySteps.Count)
             {
                 bool localReturnFound = true;
                 Node n = instructionNodes.Find(i=>i.nodeName==readySteps[loopTracker]);
@@ -152,6 +214,23 @@ namespace AoC2018
         }
         public char nodeName;
         public List<char> nodePreReqs;
+    }
+
+    public class Worker
+    {
+        public Worker(char inassignment, int delay)
+        {
+            //workerNumber = inworkerNumber;
+            assignment = inassignment;
+            isWorking = true;
+            timeLeft = inassignment-64+delay;
+            assignmentFinished = false;
+        }
+        //public int workerNumber;
+        public char assignment;
+        public bool isWorking;
+        public int timeLeft;
+        public bool assignmentFinished;
     }
 
 }
