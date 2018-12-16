@@ -13,8 +13,8 @@ namespace AoC2018
         {
             Console.WriteLine("-------------------DAY 8-------------------");
 
-            //StreamReader sr = new StreamReader("Day8Input.txt");
-            StreamReader sr = new StreamReader("Day8Input.1.txt");
+            StreamReader sr = new StreamReader("Day8Input.txt");
+            //StreamReader sr = new StreamReader("Day8Input.1.txt");
             
             string[] inputTree = sr.ReadLine().Split(' ');
             List<TreePoint> tree = ParseTree(inputTree);
